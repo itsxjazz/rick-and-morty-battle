@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.DS_Store
+.vercel/
+.vscode/
+npm-debug.log*
+yarn-error.log*
