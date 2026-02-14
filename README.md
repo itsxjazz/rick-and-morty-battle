@@ -21,19 +21,19 @@
 Diferente de jogos que apenas somam atributos, aqui **a estratégia conta!**
 
 - **Melhor de 3**: A batalha ocorre em 3 rodadas consecutivas
-- **Atributos Dinâmicos**: Cada rodada compara um atributo específico (*Sobrevivência*, *Popularidade* ou *Bizarrice*)
+- **Atributos Dinâmicos**: Cada rodada compara um atributo específico (_Sobrevivência_, _Popularidade_ ou _Bizarrice_)
 - **Fator Caos**: A ordem dos atributos é sorteada na hora, permitindo que uma carta Comum vença uma Lendária se tiver o atributo certo na rodada certa
 
 ### Fair Matchmaking (Pareamento Justo)
 
 O sistema respeita faixas de poder para garantir duelos equilibrados:
 
-| Raridade | Tier | Enfrenta |
-|----------|------|----------|
-| 🌟 Lendário | God Tier | Lendários ou Épicos |
-| 💎 Épico | High Tier | Lendários, Épicos ou Raros |
-| 🔷 Raro | Mid Tier | Épicos, Raros ou Comuns |
-| ⚪ Comum | Low Tier | Raros ou Comuns |
+| Raridade    | Tier      | Enfrenta                   |
+| ----------- | --------- | -------------------------- |
+| 🌟 Lendário | God Tier  | Lendários ou Épicos        |
+| 💎 Épico    | High Tier | Lendários, Épicos ou Raros |
+| 🔷 Raro     | Mid Tier  | Épicos, Raros ou Comuns    |
+| ⚪ Comum    | Low Tier  | Raros ou Comuns            |
 
 ### Internacionalização (i18n)
 
@@ -50,17 +50,20 @@ O sistema respeita faixas de poder para garantir duelos equilibrados:
 ## 🛠️ Tecnologias Utilizadas
 
 ### **Frontend (Client)**
+
 - Framework: **Angular 17+** (Standalone Components)
 - Estilização: **SCSS** (Sass) com variáveis CSS nativas e animações
 - Deploy: **Vercel**
 
 ### **Backend (Server)**
+
 - Runtime: **Node.js**
 - Framework: **Express.js**
 - Segurança: **CORS**, **Helmet**
 - Deploy: **Render**
 
 ### **Database**
+
 - Banco: **MongoDB Atlas**
 - Modelagem: **Mongoose**
 - Data Seeding: Script personalizado com 300+ cartas da API oficial
@@ -92,7 +95,7 @@ Siga os passos abaixo para clonar e executar o projeto na sua máquina.
 
 ```bash
 # Clone o repositório
-git clone 
+git clone
 
 # Entre na pasta do backend
 cd backend

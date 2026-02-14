@@ -1,72 +1,76 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardComponent } from './components/card/card'; 
+import { CardComponent } from './components/card/card';
 import { Card } from './models/card.model';
 import { CardService } from './services/card.service';
-import { GAME_TEXTS } from './constants/game-texts'; 
+import { GAME_TEXTS } from './constants/game-texts';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, CardComponent], 
-  templateUrl: './app.html', 
-  styleUrl: './app.scss'
+  imports: [CommonModule, CardComponent],
+  templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
-export class AppComponent implements OnInit { 
-  
+export class AppComponent implements OnInit {
   // --- BANCO DE DADOS E OPÇÕES ---
   allCards: Card[] = [];
   heroOptions: Card[] = [];
-  playerCard: Card | null = null; 
-  enemyCard: Card | null = null;  
+  playerCard: Card | null = null;
+  enemyCard: Card | null = null;
   isModalOpen: boolean = false;
 
   // --- INTERNACIONALIZAÇÃO (i18n) ---
   language: 'PT' | 'EN' = 'PT'; // Idioma padrão
   texts = GAME_TEXTS[this.language]; // Referência direta para o HTML
-  
+
   // --- ESTADOS DO JOGO ---
   gameState: 'INTRO' | 'DEALING' | 'SELECTION' | 'BATTLE' = 'INTRO';
   loading = false;
-  isDataReady = false; 
+  isDataReady = false;
   errorMessage: string | null = null;
 
   // --- PLACAR GERAL E STREAK ---
   battleResult: 'VICTORY' | 'DEFEAT' | 'DRAW' | null = null;
-  
-  scoreboard = { 
-    wins: 0, 
-    losses: 0, 
-    draws: 0, 
-    currentStreak: 0, 
-    bestStreak: 0     
+
+  scoreboard = {
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    currentStreak: 0,
+    bestStreak: 0,
   };
 
   // --- LÓGICA MD3 ---
   playerRoundWins: number = 0;
   enemyRoundWins: number = 0;
-  battleRounds: { attr: string, pVal: number, eVal: number, winner: 'PLAYER' | 'ENEMY' | 'DRAW' }[] = [];
+  battleRounds: {
+    attr: string;
+    pVal: number;
+    eVal: number;
+    winner: 'PLAYER' | 'ENEMY' | 'DRAW';
+  }[] = [];
 
   constructor(
     private cardService: CardService,
-    private cd: ChangeDetectorRef 
+    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
-    this.detectarIdioma(); // 2. Detecta o idioma salvo
-    this.carregarCartasBanco();
-    this.carregarPlacar();
+    this.detectLanguage(); // 2. Detecta o idioma salvo
+    this.fetchCardsFromDatabase();
+    this.loadScoreboard();
   }
 
   // --- LÓGICA DE IDIOMA ---
-  detectarIdioma() {
-    const salvo = localStorage.getItem('rick_battle_lang') as 'PT' | 'EN';
-    if (salvo) {
-      this.mudarIdioma(salvo);
+  detectLanguage() {
+    const saved = localStorage.getItem('rick_battle_lang') as 'PT' | 'EN';
+    if (saved) {
+      this.changeLanguage(saved);
     }
   }
 
-  mudarIdioma(lang: 'PT' | 'EN') {
+  changeLanguage(lang: 'PT' | 'EN') {
     this.language = lang;
     this.texts = GAME_TEXTS[lang];
     localStorage.setItem('rick_battle_lang', lang);
@@ -74,58 +78,58 @@ export class AppComponent implements OnInit {
   }
 
   // --- CARREGAMENTO INICIAL ---
-  carregarCartasBanco() {
+  fetchCardsFromDatabase() {
     this.isDataReady = false;
     this.errorMessage = null;
 
     this.cardService.getCards().subscribe({
-      next: (dados) => {
-        if (dados && dados.length > 0) {
-          this.allCards = dados;
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.allCards = data;
           this.isDataReady = true;
-          this.cd.detectChanges(); 
+          this.cd.detectChanges();
         } else {
-          this.errorMessage = "Portal vazio. Verifique o banco de dados.";
+          this.errorMessage = 'Portal vazio. Verifique o banco de dados.';
         }
       },
       error: (err) => {
         console.error('Erro ao conectar com o backend:', err);
-        this.errorMessage = "Erro de conexão com o portal.";
+        this.errorMessage = 'Erro de conexão com o portal.';
         this.isDataReady = false;
         this.cd.detectChanges();
-      }
+      },
     });
   }
 
-  carregarPlacar() {
-    const salvo = localStorage.getItem('rick_battle_score');
-    if (salvo) {
-      const dadosSalvos = JSON.parse(salvo);
-      this.scoreboard = { ...this.scoreboard, ...dadosSalvos };
+  loadScoreboard() {
+    const saved = localStorage.getItem('rick_battle_score');
+    if (saved) {
+      const savedData = JSON.parse(saved);
+      this.scoreboard = { ...this.scoreboard, ...savedData };
     }
   }
 
-  atualizarPlacar(resultado: 'VICTORY' | 'DEFEAT' | 'DRAW') {
-    if (resultado === 'VICTORY') {
+  updateScoreboard(result: 'VICTORY' | 'DEFEAT' | 'DRAW') {
+    if (result === 'VICTORY') {
       this.scoreboard.wins++;
-      this.scoreboard.currentStreak++; 
-      
+      this.scoreboard.currentStreak++;
+
       if (this.scoreboard.currentStreak > this.scoreboard.bestStreak) {
         this.scoreboard.bestStreak = this.scoreboard.currentStreak;
       }
-    } else if (resultado === 'DEFEAT') {
+    } else if (result === 'DEFEAT') {
       this.scoreboard.losses++;
-      this.scoreboard.currentStreak = 0; 
+      this.scoreboard.currentStreak = 0;
     } else {
       this.scoreboard.draws++;
-      this.scoreboard.currentStreak = 0; 
+      this.scoreboard.currentStreak = 0;
     }
-    
+
     localStorage.setItem('rick_battle_score', JSON.stringify(this.scoreboard));
   }
 
   // --- FLUXO DE JOGO ---
-  iniciarJogo() {
+  startGame() {
     if (!this.isDataReady || this.allCards.length === 0) return;
 
     this.gameState = 'DEALING';
@@ -133,7 +137,7 @@ export class AppComponent implements OnInit {
     this.playerCard = null;
     this.enemyCard = null;
     this.battleResult = null;
-    this.heroOptions = this.pegarCartasAleatorias(4);
+    this.heroOptions = this.getRandomCards(4);
 
     setTimeout(() => {
       this.gameState = 'SELECTION';
@@ -142,38 +146,38 @@ export class AppComponent implements OnInit {
     }, 2500);
   }
 
-  escolherCarta(card: Card) {
+  chooseCard(card: Card) {
     this.playerCard = card;
   }
 
-  async irParaBatalha() {
+  async goToBattle() {
     if (!this.playerCard) return;
 
-    let poolInimigos = this.allCards.filter(c => c._id !== this.playerCard?._id);
-    let tiersPermitidos: string[] = [];
+    let enemyPool = this.allCards.filter((c) => c._id !== this.playerCard?._id);
+    let allowedTiers: string[] = [];
 
     switch (this.playerCard.rarity) {
       case 'LEGENDARY':
-        tiersPermitidos = ['EPIC', 'LEGENDARY'];
+        allowedTiers = ['EPIC', 'LEGENDARY'];
         break;
       case 'EPIC':
-        tiersPermitidos = ['RARE', 'EPIC', 'LEGENDARY'];
+        allowedTiers = ['RARE', 'EPIC', 'LEGENDARY'];
         break;
       case 'RARE':
-        tiersPermitidos = ['COMMON', 'RARE', 'EPIC'];
+        allowedTiers = ['COMMON', 'RARE', 'EPIC'];
         break;
-      default: 
-        tiersPermitidos = ['COMMON', 'RARE'];
+      default:
+        allowedTiers = ['COMMON', 'RARE'];
         break;
     }
 
-    const inimigosValidos = poolInimigos.filter(c => tiersPermitidos.includes(c.rarity));
+    const validEnemies = enemyPool.filter((c) => allowedTiers.includes(c.rarity));
 
-    if (inimigosValidos.length > 0) {
-      poolInimigos = inimigosValidos;
+    if (validEnemies.length > 0) {
+      enemyPool = validEnemies;
     }
 
-    this.enemyCard = poolInimigos[Math.floor(Math.random() * poolInimigos.length)];
+    this.enemyCard = enemyPool[Math.floor(Math.random() * enemyPool.length)];
 
     this.gameState = 'BATTLE';
     this.battleRounds = [];
@@ -182,20 +186,20 @@ export class AppComponent implements OnInit {
     this.battleResult = null;
 
     // Tradução dos atributos baseada no idioma selecionado
-    const atributos = [
+    const attributes = [
       { key: 'survival', label: this.texts.STATS.survival },
       { key: 'popularity', label: this.texts.STATS.popularity },
-      { key: 'weirdness', label: this.texts.STATS.weirdness }
+      { key: 'weirdness', label: this.texts.STATS.weirdness },
     ];
-    
-    const ordemRodadas = [...atributos].sort(() => Math.random() - 0.5);
 
-    for (let round of ordemRodadas) {
-      await this.wait(1000); 
-      
+    const roundOrder = [...attributes].sort(() => Math.random() - 0.5);
+
+    for (let round of roundOrder) {
+      await this.wait(1000);
+
       const pVal = this.playerCard!.stats[round.key as keyof typeof this.playerCard.stats] || 0;
       const eVal = this.enemyCard!.stats[round.key as keyof typeof this.enemyCard.stats] || 0;
-      
+
       let roundWinner: 'PLAYER' | 'ENEMY' | 'DRAW';
       if (pVal > eVal) {
         this.playerRoundWins++;
@@ -212,33 +216,33 @@ export class AppComponent implements OnInit {
     }
 
     await this.wait(800);
-    
+
     if (this.playerRoundWins > this.enemyRoundWins) {
       this.battleResult = 'VICTORY';
-      this.atualizarPlacar('VICTORY');
+      this.updateScoreboard('VICTORY');
     } else if (this.enemyRoundWins > this.playerRoundWins) {
       this.battleResult = 'DEFEAT';
-      this.atualizarPlacar('DEFEAT');
+      this.updateScoreboard('DEFEAT');
     } else {
       this.battleResult = 'DRAW';
-      this.atualizarPlacar('DRAW');
+      this.updateScoreboard('DRAW');
     }
 
     this.cd.detectChanges();
   }
 
   private wait(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  sairDoJogo() {
+  exitGame() {
     this.gameState = 'INTRO';
     this.playerCard = null;
-    this.carregarCartasBanco(); 
+    this.fetchCardsFromDatabase();
   }
 
-  pegarCartasAleatorias(quantidade: number): Card[] {
-    return [...this.allCards].sort(() => 0.5 - Math.random()).slice(0, quantidade);
+  getRandomCards(amount: number): Card[] {
+    return [...this.allCards].sort(() => 0.5 - Math.random()).slice(0, amount);
   }
 
   toggleModal(state: boolean) {
