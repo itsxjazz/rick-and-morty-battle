@@ -1,6 +1,8 @@
-# 🥒 Rick and Morty Battle Card Game
+# 🥒 Rick and Morty Battle: Card Game
 
-> Entre no multiverso e batalhe pela supremacia interdimensional.
+> **Domine as dimensões. Comande seu baralho. Sobreviva ao caos.**
+
+Este é um jogo de cartas **Full Stack (MEAN)** onde os personagens do universo de Rick and Morty ganham vida através de atributos dinâmicos e uma economia de jogo balanceada.
 
 [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-green)](https://nodejs.org/)
 [![Angular](https://img.shields.io/badge/Angular-17%2B-red)](https://angular.io/)
@@ -8,128 +10,124 @@
 
 ---
 
+## 🔗 Links do Projeto
+
+| Plataforma | Link de Acesso |
+| :--- | :--- |
+| **🚀 Vercel** | [Acesse o Jogo Aqui](https://rick-and-morty-battle.vercel.app/) |
+| **🎮 Itch.io** | [Página no Itch.io](https://itsxjazz.itch.io/rick-and-morty-battle) |
+| **📺 YouTube** | [Assistir Demonstração](https://youtu.be/5jprBz-wzlM) |
+
+---
+
 ## 📖 Sobre o Projeto
 
-**Rick and Morty Battle** é um jogo de cartas estratégico desenvolvido com a **MEAN Stack** (MongoDB, Express, Angular, Node.js). O jogo consome a **API oficial de Rick and Morty** para gerar cartas colecionáveis com atributos únicos, permitindo que jogadores duelem em uma arena dinâmica.
+O **Rick and Morty Battle** utiliza a API oficial da série para gerar cartas colecionáveis. O projeto foi desenvolvido com a **MEAN Stack** (MongoDB, Express, Angular, Node.js). O grande diferencial técnico está no **Algoritmo de Balanceamento de Raridade**, que processa dados brutos (status, espécie e episódios) para classificar cada carta em tiers, garantindo uma experiência de jogo justa e viciante.
+
+---
+
+## 📸 Screenshots do Jogo
+
+<div align="center">
+  <img width="1920" alt="Home Screen" src="https://github.com/user-attachments/assets/d988892b-3fde-40fd-9adc-1d4c39d32462" />
+  <p><em>Baralho com as cartas</em></p>
+  
+  <img width="1920" alt="Selection Screen" src="https://github.com/user-attachments/assets/0d1f07fe-e25e-48f5-a9cc-9c64b0eb50b4" />
+  <p><em>Interface de seleção de cartas com sistema de tiers</em></p>
+  
+  <img width="1920" alt="Battle Arena" src="https://github.com/user-attachments/assets/87767bfc-6fe2-42cd-9ce7-da14e1e6c635" />
+  <p><em>Arena de Batalha com lógica MD3 (Melhor de 3)</em></p>
+
+  <img width="1920" alt="Modais" src="https://github.com/user-attachments/assets/2622ede7-8fce-47ab-9276-74191abe2973" />
+  <p><em>Instruções e Regras do Jogo</em></p>
+
+  <img width="1920" alt="Resultado" src="https://github.com/user-attachments/assets/90713f5f-4d78-4316-9ab0-27d5a075e36f" />
+  <p><em>Feedback visual de vitória/derrota</em></p>
+
+  <img width="1890" alt="Vitrine de Cartas" src="https://github.com/user-attachments/assets/3b75edf3-d727-44bd-b9b8-8a4ba16833b8" />
+  <p><em>Showcase Mode: Teste visual de todas as raridades</em></p>
+</div>
 
 ---
 
 ## 🚀 Funcionalidades Principais
 
-### Mecânica de Batalha: Melhor de 3 (Best of 3)
+### ⚔️ Lógica de Batalha: Melhor de 3 (MD3)
+Diferente de sistemas lineares, aqui a estratégia é fundamental:
+- **Atributos Dinâmicos:** Cada rodada foca em **Sobrevivência**, **Popularidade** ou **Bizarrice**.
+- **Fator Caos:** A ordem dos atributos é aleatória, permitindo reviravoltas onde uma carta comum pode vencer uma lendária no atributo certo.
 
-Diferente de jogos que apenas somam atributos, aqui **a estratégia conta!**
+### ⚖️ Sistema de Raridade & Fair Play
+Há um sistema de pesos para equilibrar o "drop rate" e garantir duelos equilibrados:
 
-- **Melhor de 3**: A batalha ocorre em 3 rodadas consecutivas
-- **Atributos Dinâmicos**: Cada rodada compara um atributo específico (_Sobrevivência_, _Popularidade_ ou _Bizarrice_)
-- **Fator Caos**: A ordem dos atributos é sorteada na hora, permitindo que uma carta Comum vença uma Lendária se tiver o atributo certo na rodada certa
+| Raridade | Tier | Enfrenta | Requisito (Total Power) |
+| :--- | :--- | :--- | :--- |
+| 🌟 **Lendário** | God Tier | Lendários ou Épicos | ≥ 230 |
+| 💎 **Épico** | High Tier | Lendários, Épicos ou Raros | ≥ 190 |
+| 🔷 **Raro** | Mid Tier | Épicos, Raros ou Comuns | ≥ 145 |
+| ⚪ **Comum** | Low Tier | Raros ou Comuns | < 145 |
 
-### Fair Matchmaking (Pareamento Justo)
+### 🌍 Internacionalização 
+- **Bilingue:** Suporte completo para **Português (PT)** e **Inglês (EN)** com persistência de escolha via `localStorage`.
 
-O sistema respeita faixas de poder para garantir duelos equilibrados:
+### 📱 Mobile Experience
+- **Orientation Lock:** Bloqueio visual solicitando modo paisagem (landscape) para garantir a melhor experiência de jogo em dispositivos móveis.
 
-| Raridade    | Tier      | Enfrenta                   |
-| ----------- | --------- | -------------------------- |
-| 🌟 Lendário | God Tier  | Lendários ou Épicos        |
-| 💎 Épico    | High Tier | Lendários, Épicos ou Raros |
-| 🔷 Raro     | Mid Tier  | Épicos, Raros ou Comuns    |
-| ⚪ Comum    | Low Tier  | Raros ou Comuns            |
+---
 
-### Internacionalização (i18n)
+## 🧠 Arquitetura e Decisões Técnicas
 
-- Suporte completo para **Português (PT)** e **Inglês (EN)**
-- Tradução em tempo real de interface, atributos e nomes de personagens
-- Persistência de preferência de idioma no navegador
+Este projeto vai além do consumo de API, implementando pipelines de dados e algoritmos de balanceamento.
 
-### Mobile Experience
+### 1. Backend: Controle e Performance
+* **Modelagem (`models/Card.js`)**: Utiliza **Mongoose Schemas** para definição de tipagem estrita e organização de atributos (`stats`).
+* **Agregação (`routes/cards.js`)**: O sorteio de cartas utiliza o estágio **`$sample`** do MongoDB Aggregation Pipeline.
+    * *Diferencial:* Delegar o sorteio ao banco de dados (Atlas) economiza memória do servidor (Render) e otimiza a performance para grandes volumes de dados.
 
-- Orientation Lock: Bloqueio visual solicitando modo paisagem (landscape)
+### 2. Pipeline de Dados (ETL)
+O script de seeding (`seed.js`) executa um processo robusto de **Extract, Transform, Load**:
+* **Extract**: Seleção aleatória de páginas da API para diversidade do deck.
+* **Transform**: Conversão de metadados brutos em atributos de RPG equilibrados via `gameLogic.js`.
+* **Load**: Persistência eficiente utilizando `insertMany`.
+
+### 3. Auditoria e BI (`check-balance.js`)
+Ferramenta interna que gera relatórios de distribuição de raridade e espécies, garantindo que o "meta-game" permaneça saudável (ex: manter cartas Lendárias em apenas ~1.6% do total).
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-### **Frontend (Client)**
+### **Frontend (Angular)**
+- **Framework:** Angular 17+ (Componentes Standalone)
+- **Serviços:** Injeção de dependência e Observables (RxJS) para comunicação assíncrona.
+- **Estilização:** SCSS (Sass) com Mixins, variáveis nativas e Glassmorphism.
 
-- Framework: **Angular 17+** (Standalone Components)
-- Estilização: **SCSS** (Sass) com variáveis CSS nativas e animações
-- Deploy: **Vercel**
+### **Backend (Node.js)**
+- **Framework:** Express.js
+- **Segurança:** Helmet, CORS e sanitização de dados.
+- **Banco de Dados:** MongoDB Atlas com Mongoose.
 
-### **Backend (Server)**
-
-- Runtime: **Node.js**
-- Framework: **Express.js**
-- Segurança: **CORS**, **Helmet**
-- Deploy: **Render**
-
-### **Database**
-
-- Banco: **MongoDB Atlas**
-- Modelagem: **Mongoose**
-- Data Seeding: Script personalizado com 300+ cartas da API oficial
-
-<!-- --- -->
-
-<!-- ## 📸 Screenshots
-
-| Tela | Preview |
-|------|---------|
-| Home | _(Insira aqui um print da Home)_ |
-| Seleção de Cartas | _(Insira aqui um print da Seleção)_ |
-| Arena de Batalha | _(Insira aqui um print da Batalha)_ |
-| Vitória | _(Insira aqui um print da Vitória)_ | -->
+### **Infraestrutura**
+- **Deploy Frontend:** Vercel
+- **Deploy Backend:** Render
 
 ---
 
 ## ⚙️ Como Rodar Localmente
 
-Siga os passos abaixo para clonar e executar o projeto na sua máquina.
-
 ### Pré-requisitos
-
 - **Node.js** (v18+)
 - **MongoDB** (Local ou URI do Atlas)
 - **npm** ou **yarn**
 
-### Backend (API)
-
+### Backend e Frontend 
 ```bash
-# Clone o repositório
-git clone
-
-# Entre na pasta do backend
 cd backend
-
-# Instale as dependências
 npm install
-
-# Configure as variáveis de ambiente (.env)
-# Crie um arquivo .env com:
-# PORT=3000
-# MONGO_URI=sua_string_de_conexao_mongodb
-
-# Popule o banco de dados (apenas na primeira vez)
-node seed.js
-
-# Inicie o servidor
+# Configure o .env com PORT e MONGO_URI
+node seed.js # Popula o banco
 npm start
-```
 
-**Servidor rodando em:** `http://localhost:3000`
-
-### Frontend (Angular)
-
-```bash
-# Entre na pasta do frontend
 cd frontend
-
-# Instale as dependências
 npm install
-
-# Inicie o servidor de desenvolvimento
 ng serve --open
-```
-
-<!-- **Aplicação disponível em:** `http://localhost:4200` -->
-
----
