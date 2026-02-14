@@ -1,0 +1,682 @@
+/* --- FONTE RICK AND MORTY --- */
+@font-face {
+  font-family: 'Get Schwifty';
+  src: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/3089507/get-schwifty.woff') format('woff');
+}
+
+/* --- VARIÁVEIS SCSS NATIVAS --- */
+$portal-green: #00b5cc; 
+$neon-green: #97ce4c;   
+$space-black: #0b0c10;
+
+/* CORES DE RESULTADO */
+$color-win: #00d2ff;   /* Azul Neon para Vitória */
+$color-lose: #ff0055;  /* Vermelho para Derrota */
+$color-draw: #ffd700;  /* Amarelo para Empate */
+
+/* --- RESET GLOBAL --- */
+html, body {
+  height: 100%; width: 100%; margin: 0; padding: 0;
+  background-color: $space-black; overflow-x: hidden;
+}
+
+/* --- MIXIN DE BOTÃO --- */
+@mixin button-style {
+  background: transparent; border: 2px solid $neon-green; color: $neon-green;
+  padding: clamp(10px, 2vw, 15px) clamp(20px, 5vw, 45px);       
+  font-size: clamp(0.9rem, 2vw, 1.2rem); border-radius: 50px;
+  cursor: pointer; transition: all 0.3s ease;
+  user-select: none;
+  text-transform: uppercase; letter-spacing: 2px; font-weight: 900;
+  margin-top: 15px; box-shadow: 0 0 10px rgba(151, 206, 76, 0.2);
+  &:hover { background: $neon-green; color: $space-black; box-shadow: 0 0 40px $neon-green; transform: scale(1.05); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+}
+
+/* --- CONTAINER PRINCIPAL --- */
+.main-container {
+  display: flex; flex-direction: column; width: 100%; min-height: 100vh;
+  margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('../assets/rickandmortybackground.jpg'); 
+  background-size: cover; background-position: center center;
+  background-repeat: no-repeat; background-attachment: fixed;
+  position: relative; overflow-x: hidden; overflow-y: auto; 
+  &::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: 0; pointer-events: none; }
+}
+
+section {
+  position: relative; z-index: 1; width: 100%; min-height: 100vh; 
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 20px; box-sizing: border-box; animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* --- LOADING SPINNER ---
+.loading-container {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  color: $neon-green; text-shadow: 0 0 10px rgba(151, 206, 76, 0.5);
+  margin-top: 10px;
+  position: relative;
+  z-index: 20;
+  .spinner { width: 80px; height: 80px; border: 8px solid rgba(151, 206, 76, 0.1); border-top: 8px solid $neon-green; border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(151, 206, 76, 0.3); }
+  p { font-weight: 900; text-transform: uppercase; letter-spacing: 3px; font-size: 1.2rem; }
+}
+*/
+
+.top-actions {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 100;
+}
+
+.lang-selector {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(151, 206, 76, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  button {
+    background: none;
+    border: none;
+    color: #666;
+    font-weight: 900;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover { color: #fff; }
+    &.active {
+      color: $neon-green;
+      text-shadow: 0 0 10px $neon-green;
+    }
+  }
+
+  .divider {
+    color: #333;
+    font-size: 0.7rem;
+  }
+}
+
+/* --- TELA DE ABERTURA --- */
+.intro-screen {
+  .logo-container { display: grid; grid-template-areas: "stack"; place-items: center; width: 100%; max-width: 95vw; min-height: clamp(150px, 30vw, 300px); animation: floatLogo 3s ease-in-out infinite; }
+  .logo-layer { grid-area: stack; font-family: 'Get Schwifty', sans-serif; font-size: clamp(2.2rem, 10vw, 7rem); line-height: 1.1; margin: 0; text-align: center; width: 100%; white-space: normal; }
+  .logo-layer.ghost { color: transparent; z-index: 0; position: relative; }
+  .logo-layer.top { color: $portal-green; z-index: 3; -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1); }
+  .logo-layer.middle { color: #edfc30; z-index: 2; -webkit-text-stroke: 0.12em #edfc30; }
+  .logo-layer.bottom { color: transparent; z-index: 1; filter: drop-shadow(0 0 20px rgba(100, 200, 50, 0.9)); }
+  .subtitle { font-size: clamp(0.7rem, 2.5vw, 1.2rem); color: $neon-green; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 15px $neon-green; max-width: 90%; text-align: center; }
+  .btn-start-game { @include button-style; }
+}
+
+/* --- ANIMAÇÃO BARALHO --- */
+.dealing-screen {
+  overflow: hidden;
+  .deck-container { position: relative; width: 100%; height: 0px; display: flex; justify-content: center; align-items: center; perspective: 1000px; --dist: 160px; }
+  .deck-card {
+    position: absolute; transform: scale(0) rotateY(180deg); opacity: 0;
+    animation: dealCards 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) { animation-delay: #{$i * 0.15}s; --target-x: calc((#{$i} - 2.5) * var(--dist)); --target-rotate: #{( ($i - 2.5) * 8 )}deg; }
+    }
+  }
+}
+
+/* --- FASE 2: SELEÇÃO --- */
+.header-hud {
+  display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 40px;
+  h2 { color: white; font-size: clamp(1.2rem, 3vw, 1.8rem); text-shadow: 0 0 15px $neon-green; text-transform: uppercase; margin-bottom: 10px; text-align: center; }
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* Garante mesma altura */
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Permite quebrar linha em telas muito pequenas */
+}
+
+.full-scoreboard {
+  display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3vw, 25px);
+  background: rgba(11, 12, 16, 0.9); padding: 8px clamp(15px, 4vw, 25px);
+  border-radius: 20px; border: 2px solid $neon-green; box-shadow: 0 0 20px rgba(151, 206, 76, 0.4);
+  margin-bottom: 0;
+}
+
+.streak-badge-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(11, 12, 16, 0.9); /* Mesmo fundo do placar */
+  border: 2px solid #ff6600;         /* Borda Laranja */
+  border-radius: 20px;
+  padding: 6px 15px;
+  box-shadow: 0 0 20px rgba(255, 102, 0, 0.2);
+  animation: pulseContainer 2s infinite alternate;
+
+  .fire-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px #ff4500);
+  }
+
+  .streak-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    .streak-title {
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #ffaa00;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .streak-record {
+      font-size: 0.6rem;
+      color: #aaa;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
+}
+
+.score-item {
+  display: flex; flex-direction: column; align-items: center;
+  .stat-label { font-size: clamp(0.5rem, 1.2vw, 0.6rem); color: #888; text-transform: uppercase; font-weight: bold; }
+  .stat-value { font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight: 900; font-family: 'Courier New', monospace; line-height: 1; }
+  &.win .stat-value { color: $color-win; }
+  &.draw .stat-value { color: $color-draw; }
+  &.loss .stat-value { color: $color-lose; }
+}
+
+.score-line { width: 2px; height: 30px; background: #333; }
+
+/* --- SISTEMA DE STREAK --- */
+.streak-badge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.8); border: 1px solid #ff6600; border-radius: 15px; padding: 8px 30px; 
+  margin-top: 15px; margin-bottom: 25px; 
+  box-shadow: 0 0 8px rgba(255, 102, 0, 0.2); animation: pulseContainer 2s infinite alternate;
+
+  .fire-icon { font-size: 1.5rem; margin-bottom: 2px; filter: drop-shadow(0 0 8px #ff4500);}
+  .streak-text { font-size: 0.9rem; font-weight: 900; color: #ffaa00; text-transform: uppercase; text-shadow: 0 0 15px #ff6600; letter-spacing: 3px; line-height: 1.2; }
+  .best-streak { font-size: 0.65rem; color: #ccc; background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 10px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+}
+
+.cards-selection {
+  display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; width: 100%; padding-bottom: 10px; max-width: 1400px; margin: 0 auto; padding-top: 40px;
+  ::ng-deep .card-chassis {
+    transform: scale(0.8); 
+    margin: -20px -10px;    
+    transition: all 0.3s ease; 
+  }
+}
+
+.card-wrapper.selected ::ng-deep .card-chassis {
+  border-color: $neon-green; box-shadow: 0 0 30px $neon-green; transform: translateY(-10px) scale(0.9); z-index: 10;
+}
+
+.btn-battle { @include button-style; animation: pulse-green 1.5s infinite alternate; }
+
+/* --- FASE 3: ARENA --- */
+.battle-arena {
+  width: 100%; max-width: 1200px; margin: 0 auto;
+  .battle-title { 
+    font-size: clamp(1.8rem, 6vw, 3rem); text-transform: uppercase; font-weight: 900; text-align: center; margin-bottom: 50px; color: white;
+    &.win { text-shadow: 0 0 30px $color-win, 0 0 10px $color-win; }
+    &.lose { text-shadow: 0 0 30px $color-lose, 0 0 10px $color-lose; }
+    &.draw { text-shadow: 0 0 30px $color-draw, 0 0 10px $color-draw; }
+  }
+}
+
+.versus-container {
+  display: grid; grid-template-columns: 1fr 300px 1fr; align-items: center; gap: 40px; width: 100%; max-width: 1300px;
+}
+
+.card-display {
+  position: relative; transition: all 0.6s ease;
+  &.status-win {
+    transform: translateY(10px) scale(1.05); z-index: 5;
+    ::ng-deep .card-chassis { border-color: $color-win !important; box-shadow: 0 0 50px $color-win !important; }
+  }
+  &.status-lose { ::ng-deep .card-chassis { filter: grayscale(1) brightness(0.4) contrast(1.2) !important; border-color: #444 !important; opacity: 0.7; } }
+  &.status-draw { ::ng-deep .card-chassis { border-color: $color-draw !important; box-shadow: 0 0 30px $color-draw !important; } }
+}
+
+.rounds-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; order: 2;
+  .rounds-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .round-item {
+    display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.95); padding: 15px 25px; border-radius: 10px; border: 1.5px solid #333; font-family: 'Orbitron', sans-serif; animation: slideInRound 0.5s ease-out forwards;
+    &.PLAYER { border-color: $neon-green; box-shadow: inset 0 0 15px rgba(151, 206, 76, 0.2); .p-val { color: $neon-green; font-weight: 900; } }
+    &.ENEMY { border-color: $color-lose; box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.2); .e-val { color: $color-lose; font-weight: 900; } }
+    &.DRAW { border-color: $color-draw; }
+    .round-attr { font-size: 0.85rem; color: #fff; text-transform: uppercase; font-weight: bold; opacity: 0.8; }
+    .round-val { font-size: 1.4rem; width: 40px; text-align: center; font-weight: bold;}
+  }
+}
+
+.fighter {
+  display: flex; flex-direction: column; align-items: center;
+  h3 { 
+    font-size: 1rem; margin-bottom: 10px; color: white; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; transition: all 0.5s ease; border: 1px solid transparent; gap: 20px;
+    &.status-win { color: $color-win; text-shadow: 0 0 15px $color-win;}
+    &.status-lose { color: $color-lose; text-shadow: 0 0 15px $color-lose;}
+    &.status-draw { color: $color-draw; text-shadow: 0 0 15px $color-draw;}
+  }
+  &.player { order: 1; }
+  &.enemy { order: 3; }
+}
+
+.score-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.7);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* BOTÃO DE AJUDA NA HOME */
+.btn-help {
+  position: static;
+  top: 20px;
+  right: 20px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid $neon-green;
+  background: rgba(0,0,0,0.5);
+  color: $neon-green;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    box-shadow: 0 0 15px $neon-green;
+    transform: scale(1.1);
+  }
+}
+
+/* ESTRUTURA DO MODAL */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-card {
+  background: #0b0c10;
+  border: 3px solid $portal-green;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  box-shadow: 0 0 30px rgba(0, 181, 204, 0.4);
+  position: relative;
+
+  h2 {
+    color: #edfc30;
+    font-family: 'Get Schwifty', sans-serif;
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+  }
+
+  .modal-body {
+    color: white;
+    line-height: 1.6;
+    p { margin-bottom: 15px; }
+    strong { color: $neon-green; }
+  }
+
+  .icons-legend-container {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(151, 206, 76, 0.2); 
+
+  .legend-title {
+    font-size: 0.9rem;
+    color: $neon-green;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+}
+
+.icons-row {
+  display: flex;
+  flex-direction: row;    
+  justify-content: space-around; 
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 10px;
+
+  .icon-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;           
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #ccc;
+
+    span {
+      font-size: 1.2rem;    
+      filter: drop-shadow(0 0 5px $neon-green);
+    }
+  }
+}
+}
+
+.close-x {
+  position: absolute;
+  top: 15px; right: 20px;
+  background: none; border: none;
+  color: #666; font-size: 2rem;
+  cursor: pointer;
+  &:hover { color: white; }
+}
+
+.btn-close-modal {
+  @include button-style;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* --- ANIMAÇÕES --- */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+@keyframes slideInRound { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes dealCards {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); left: 50%; top: 50%; opacity: 0; }
+  100% { left: 50%; top: 50%; opacity: 1; transform: translate(calc(-50% + var(--target-x)), -50%) scale(1) rotate(var(--target-rotate)); }
+}
+@keyframes pulse-green { from { box-shadow: 0 0 10px $neon-green; } to { box-shadow: 0 0 40px $neon-green; } }
+@keyframes pulseContainer { from { box-shadow: 0 0 10px rgba(255, 102, 0, 0.2); border-color: #ff6600; } to { box-shadow: 0 0 25px rgba(255, 102, 0, 0.5); border-color: #ffcc00; } }
+@keyframes flicker { 0% { transform: scale(1) rotate(-2deg); opacity: 1; } 50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; } 100% { transform: scale(1) rotate(-2deg); opacity: 1; } }
+
+.actions-container { display: flex; gap: 15px; margin-top: 40px; flex-wrap: wrap; justify-content: center; }
+.btn-restart, .btn-quit { @include button-style; margin-top: 0; }
+
+/* ---------------------------------------------------------
+   --- AJUSTES EXCLUSIVOS PARA MOBILE (RESPONSIVIDADE) --- 
+--------------------------------------------------------- */
+/* Estilos para Celulares Deitados (Landscape) e telas menores */
+@media (max-width: 932px) { 
+  .header-hud {
+    margin-bottom: 5px;
+    h2 { font-size: 0.9rem; }
+  }
+
+  /* Ajuste Geral de Seção */
+  section { padding: 10px; min-height: 100vh; }
+
+  /* 1. TELA INICIAL (INTRO) */
+  .intro-screen {
+    .logo-layer { font-size: 3rem; }
+    .subtitle { font-size: 0.8rem; margin-top: 5px; margin-bottom: 10px; }
+    .btn-start-game { margin-top: 10px; padding: 10px 30px; }
+  }
+
+  /* 2. PLACAR E HUD (Compactação Extrema) */
+  .header-hud {
+    margin-bottom: 1px;
+    h2 { font-size: 1rem; margin-bottom: 5px; }
+  }
+
+  .stats-bar {
+    gap: 10px;
+    margin-bottom: 10px;
+    transform: scale(0.9); /* Reduz um pouco tudo pra caber */
+  }
+
+  .full-scoreboard {
+    padding: 5px 15px; 
+    .stat-label { font-size: 0.5rem; }
+    .stat-value { font-size: 1.1rem; }
+    .score-line { height: 20px; }
+  }
+
+  .streak-badge-inline {
+    .fire-icon { font-size: 1.2rem; }
+    .streak-title { font-size: 0.7rem; }
+    .streak-record { font-size: 0.6rem; }
+  }
+
+  /* --- AJUSTE DO BARALHO PARA LANDSCAPE --- */
+  .dealing-screen {
+    .deck-container {
+      height: 220px; /* Reduz a altura para caber na tela deitada */
+      --dist: 85px;  /* Aproxima as cartas para não saírem pelas laterais */
+    }
+    .deck-card {
+      animation-name: dealCardsMobile 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Força o uso da animação com escala menor */
+      animation-fill-mode: forwards;
+      }
+}
+
+  /* 3. SELEÇÃO DE CARTAS (Fileira Única Horizontal) */
+  .cards-selection {
+    gap: 5px;
+    flex-wrap: nowrap; /* Força uma linha */
+    justify-content: center;
+    margin-bottom: 1px;
+    
+    ::ng-deep .card-chassis { 
+      transform: scale(0.6); /* Cartas menores para caber na altura */
+      margin: -15px -10px;    /* Compensação do scale */
+      &:hover, &:active, &:focus {
+      transform: scale(0.6);
+    }
+    }
+  }
+
+  .card-wrapper.selected ::ng-deep .card-chassis {
+  transform: translateY(-5px) scale(0.6) !important; 
+  box-shadow: 0 0 20px $neon-green !important;
+  z-index: 100;
+}
+
+  /* 4. ARENA DE BATALHA (Lado a Lado no Landscape) */
+  .battle-arena {
+    .battle-title { font-size: 1.4rem; margin-bottom: 5px; }
+    
+    .versus-container {
+      grid-template-columns: 1fr 180px 1fr; /* Proporção ideal para mobile horizontal */
+      gap: 0px;
+      margin-bottom: 20px;
+    }
+
+    .fighter {
+      h3 { font-size: 0.75rem; padding: 4px 15px; margin-bottom: -5px; gap: 15px }
+      ::ng-deep .card-chassis { transform: scale(0.65); margin: -50px 0 !important; }
+    }
+
+    .score-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+        border-width: 1.5px;
+      }
+
+    .rounds-panel {
+      gap: 10px;
+      .round-item {
+        padding: 5px 10px;
+        .round-val { font-size: 0.8rem; width: 25px; }
+        .round-attr { font-size: 0.5rem; }
+      }
+    }
+  }
+
+  /* Botões de Ação */
+  /* 1. REGRA GERAL PARA TODOS OS BOTÕES NO MOBILE */
+  .btn-start-game,
+  .btn-battle,
+  .btn-restart,
+  .btn-quit,
+  .btn-close-modal {
+      /* Sobrescreve os 15px/30px do desktop */
+      margin-top: 5px !important; 
+      margin-bottom: 5px !important;
+      
+      /* Mantém o tamanho da fonte e padding reduzidos se necessário */
+      font-size: 0.9rem;
+      padding: 8px 25px; 
+  }
+
+  .actions-container {
+    margin-top: 5px !important; 
+    padding-top: 0;
+    gap: 10px; /* Espaço lateral entre os botões */
+    margin-bottom: 10px;
+    // .btn-restart, .btn-quit { padding: 8px 20px; font-size: 0.7rem; margin: 0; }
+  }
+
+  /* Modal de Regras Adaptado */
+  .modal-card {
+    max-width: 80%; padding: 15px;
+    max-height: 90vh; overflow-y: auto; /* Permite scroll se a tela for muito baixa */
+    h2 { font-size: 1.5rem; margin-bottom: 10px; }
+    .modal-body p { font-size: 0.8rem; margin-bottom: 8px; }
+  }
+}
+
+/* Ajuste específico para telas MUITO curtas */
+@media (max-height: 420px) {
+  .intro-screen .logo-container { min-height: 100px; }
+  .cards-selection ::ng-deep .card-chassis { transform: scale(0.55); margin: -60px -35px;}
+  .fighter ::ng-deep .card-chassis { transform: scale(0.55); }
+  .dealing-screen .deck-container { --dist: 75px; height: 180px;}
+}
+
+@keyframes dealCardsMobile {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); left: 50%; top: 50%; opacity: 0; }
+  100% { left: 50%; top: 50%; opacity: 1; transform: translate(calc(-50% + var(--target-x)), -50%) scale(0.5) rotate(var(--target-rotate)) }
+}
+
+@media (max-width: 380px) {
+  .intro-screen .logo-layer { font-size: 2.8rem; }
+  .fighter ::ng-deep .card-chassis { transform: scale(0.7); }
+}
+
+/* ---------------------------------------------------------
+   --- ORIENTATION LOCK (BLOQUEIO DE RETRATO) --- 
+--------------------------------------------------------- */
+
+/* Estado padrão: Escondido */
+.orientation-lock {
+  display: none; 
+}
+
+/* Só aparece se for Celular (Touch) E estiver em Pé (Portrait) */
+@media (orientation: portrait) and (pointer: coarse) {
+  
+  .orientation-lock {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #0b0c10; /* Fundo preto espacial */
+    z-index: 99999; /* Acima de TUDO */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background-image: url('../assets/rickandmortybackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+  }
+
+  /* Oculta o jogo atrás */
+  .main-container {
+    display: none !important;
+  }
+
+  .lock-content {
+    animation: fadeIn 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* Espaçamento consistente entre ícone e textos */
+    max-width: 90%;
+    
+    h2 {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: white;
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px $neon-green;
+      text-align: center;
+      margin: 0;
+    }
+
+    p {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: $neon-green;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(151, 206, 76, 0.5);
+      text-align: center;
+      margin: 0;
+    }
+  }
+
+  /* Animação do ícone de celular girando */
+  .phone-icon {
+    width: 70px;
+    height: 110px;
+    border: 4px solid $neon-green;
+    border-radius: 12px;
+    position: relative;
+    animation: rotatePhone 2s infinite ease-in-out;
+    box-shadow: 0 0 30px rgba(151, 206, 76, 0.3);
+    background: rgba(0,0,0,0.3);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 6px; right: 6px; bottom: 12px;
+      background: rgba(151, 206, 76, 0.15);
+      border-radius: 4px;
+      border: 1px solid rgba(151, 206, 76, 0.3);
+    }
+  }
+}
+
+/* Animação Keyframes: Gira o celular de pé para deitado */
+@keyframes rotatePhone {
+  0%, 15% { transform: rotate(0deg); opacity: 1; }
+  50%, 65% { transform: rotate(90deg); opacity: 1; }
+  90%, 100% { transform: rotate(0deg); opacity: 1; }
+}

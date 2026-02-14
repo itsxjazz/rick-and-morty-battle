@@ -1,0 +1,41 @@
+<div *ngIf="card && currentTexts" class="card-chassis" [ngClass]="card.rarity.toLowerCase()">
+  
+  <div class="screws"></div>
+
+  <div class="card-header">
+    <span class="rarity">{{ currentTexts.RARITY[card.rarity] }}</span>
+    <span class="species">{{ currentTexts.CARD_DATA.SPECIES[card.species] || card.species }}</span>
+  </div>
+
+  <div class="screen-container">
+    <div class="scanlines"></div>
+    <div class="glitch-overlay"></div>
+    <img [src]="card.image" [alt]="card.name" class="character-image">
+  </div>
+
+  <div class="data-panel">
+    <h3 class="name">{{ card.name }}</h3>
+
+    <div class="status-indicator">
+      <span class="led" [class.alive]="card.status === 'Alive'" [class.dead]="card.status === 'Dead'"></span>
+      {{ currentTexts.CARD_DATA.STATUS[card.status] || card.status }}
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box" [title]="currentTexts.STATS.survival">
+        <span class="stat-icon">🛡️</span>
+        <span class="stat-value">{{ card.stats.survival }}</span>
+      </div>
+      
+      <div class="stat-box" [title]="currentTexts.STATS.popularity">
+        <span class="stat-icon">🌟</span>
+        <span class="stat-value">{{ card.stats.popularity }}</span>
+      </div>
+      
+      <div class="stat-box" [title]="currentTexts.STATS.weirdness">
+        <span class="stat-icon">👽</span>
+        <span class="stat-value">{{ card.stats.weirdness }}</span>
+      </div>
+    </div>
+  </div>
+</div>
