@@ -7,42 +7,60 @@ const MONGO_URI = process.env.MONGO_URI;
 const analyzeData = async () => {
   try {
     await mongoose.connect(MONGO_URI);
-    console.log(" Conectado para análise...\n");
+    console.log("Conectado para análise de balanceamento (Multiverso)...\n");
 
-    console.log("--- CONTAGEM POR ESPÉCIE ---");
-    // Agrupa por espécie e conta
-    const speciesStats = await Card.aggregate([
-      { $group: { _id: "$species", total: { $sum: 1 } } },
-      { $sort: { total: -1 } }, // Ordena do maior para o menor
+    // Executa múltiplos agrupamentos em paralelo com uma única varredura de dados física
+    const [auditResult] = await Card.aggregate([
+      {
+        $facet: {
+          speciesStats: [
+            { $group: { _id: "$species", total: { $sum: 1 } } },
+            { $sort: { total: -1 } },
+          ],
+          typeStats: [
+            { $match: { type: { $ne: "" } } }, // Ignora tipos vazios
+            { $group: { _id: "$type", total: { $sum: 1 } } },
+            { $sort: { total: -1 } },
+          ],
+          rarityStats: [
+            { $group: { _id: "$rarity", total: { $sum: 1 } } },
+            { $sort: { total: -1 } },
+          ],
+        },
+      },
     ]);
 
-    // Exibe como uma tabela no terminal
+    console.log("--- DISTRIBUIÇÃO POR ESPÉCIE ---");
     console.table(
-      speciesStats.map((s) => ({ Espécie: s._id, Quantidade: s.total })),
+      auditResult.speciesStats.map((s) => ({
+        Espécie: s._id || "Desconhecido",
+        Quantidade: s.total,
+      }))
     );
 
-    console.log("\n--- CONTAGEM POR TIPO (Especiais) ---");
-    // Agrupa por tipo, mas filtra os vazios para não poluir
-    const typeStats = await Card.aggregate([
-      { $match: { type: { $ne: "" } } }, // Ignora tipos vazios
-      { $group: { _id: "$type", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-    ]);
+    console.log("\n--- DISTRIBUIÇÃO POR SUB-TIPO (Especiais) ---");
+    if (auditResult.typeStats.length > 0) {
+      console.table(
+        auditResult.typeStats.map((t) => ({
+          Tipo: t._id,
+          Quantidade: t.total,
+        }))
+      );
+    } else {
+      console.log("Nenhuma sub-especificação especial encontrada.");
+    }
 
-    console.table(typeStats.map((t) => ({ Tipo: t._id, Quantidade: t.total })));
-
-    console.log("\n--- CONTAGEM POR RARIDADE ---");
-    const rarityStats = await Card.aggregate([
-      { $group: { _id: "$rarity", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-    ]);
+    console.log("\n --- DISTRIBUIÇÃO POR RARIDADE ---");
     console.table(
-      rarityStats.map((r) => ({ Raridade: r._id, Quantidade: r.total })),
+      auditResult.rarityStats.map((r) => ({
+        Raridade: r._id,
+        Quantidade: r.total,
+      }))
     );
 
-    process.exit();
+    process.exit(0);
   } catch (error) {
-    console.error("Erro:", error);
+    console.error("Erro ao analisar os dados:", error);
     process.exit(1);
   }
 };

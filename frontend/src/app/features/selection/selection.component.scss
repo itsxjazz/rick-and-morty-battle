@@ -1,0 +1,263 @@
+@use 'variables' as var;
+@use 'mixins' as mix;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.header-hud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 40px; 
+  
+  h2 {
+    font-family: var.$font-family-game;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-align: center;
+    @include mix.neon-text-glow(var.$neon-green, 6px);
+  }
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 15px;
+  margin-bottom: 35px; 
+  flex-wrap: wrap;
+}
+
+.full-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 25px);
+  padding: 8px clamp(15px, 4vw, 25px);
+  @include mix.glass-panel(#0b0c10, 0.9, rgba(151, 206, 76, 0.35));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+}
+
+.streak-badge-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 15px;
+  @include mix.glass-panel(#0b0c10, 0.9, rgba(0, 210, 255, 0.35));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+
+  .fire-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px #00d2ff);
+  }
+
+  .streak-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .streak-title {
+      font-family: var.$font-family-mono;
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #00d2ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .streak-record {
+      font-family: var.$font-family-mono;
+      font-size: 0.6rem;
+      color: #aaa;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .stat-label {
+    font-family: var.$font-family-mono;
+    font-size: clamp(0.5rem, 1.2vw, 0.6rem);
+    color: #888;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  
+  .stat-value {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 900;
+    font-family: var.$font-family-mono;
+    line-height: 1;
+  }
+  
+  &.win .stat-value {
+    color: var.$color-win;
+  }
+  &.draw .stat-value {
+    color: var.$color-draw;
+  }
+  &.loss .stat-value {
+    color: var.$color-lose;
+  }
+}
+
+.score-line {
+  width: 2px;
+  height: 30px;
+  background: #333;
+}
+
+.cards-selection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-bottom: 0px; // Reset padding!
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 0px; // Reset padding!
+  
+  .card-wrapper {
+    transform: scale(0.8);
+    margin: -26px -10px;
+    transition: all 0.3s ease;
+    
+    &.selected {
+      transform: translateY(-10px) scale(0.9);
+      z-index: 10;
+      
+      ::ng-deep .card-chassis {
+        border-color: var.$neon-green;
+        box-shadow: 0 0 30px var.$neon-green;
+      }
+    }
+  }
+}
+
+.actions-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-battle {
+  @include mix.button-style;
+  margin-top: 0;
+  animation: pulse-green 1.5s infinite alternate;
+}
+
+
+@keyframes pulse-green {
+  from {
+    box-shadow: 0 0 10px var.$neon-green;
+  }
+  to {
+    box-shadow: 0 0 40px var.$neon-green;
+  }
+}
+
+/* Responsividade */
+@include mix.mobile-landscape {
+  .header-hud {
+    margin-bottom: 22px; 
+    
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+  }
+
+  .stats-bar {
+    gap: 10px;
+    margin-bottom: 20px; 
+    transform: scale(0.9);
+  }
+
+  .full-scoreboard {
+    padding: 5px 15px;
+    
+    .stat-label {
+      font-size: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.1rem;
+    }
+    
+    .score-line {
+      height: 20px;
+    }
+  }
+
+  .streak-badge-inline {
+    .fire-icon {
+      font-size: 1.2rem;
+    }
+    .streak-title {
+      font-size: 0.7rem;
+    }
+    .streak-record {
+      font-size: 0.6rem;
+    }
+  }
+
+  .cards-selection {
+    gap: 5px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin-bottom: 1px;
+    padding-top: 0px;
+
+    .card-wrapper {
+      transform: scale(0.6);
+      margin: -52px -10px; 
+      
+      &:hover,
+      &:active,
+      &:focus {
+        transform: scale(0.6);
+      }
+      
+      &.selected {
+        transform: translateY(-5px) scale(0.6) !important;
+        box-shadow: 0 0 20px var.$neon-green !important;
+        z-index: 100;
+        
+        ::ng-deep .card-chassis {
+          border-color: var.$neon-green !important;
+        }
+      }
+    }
+  }
+
+  .actions-container {
+    margin-top: 22px !important; 
+    margin-bottom: 10px;
+    
+    .btn-battle {
+      font-size: 0.9rem;
+      padding: 8px 25px;
+    }
+  }
+}
+
+@include mix.ultra-short-screens {
+  .cards-selection .card-wrapper {
+    transform: scale(0.55);
+    margin: -60px -35px;
+  }
+}
