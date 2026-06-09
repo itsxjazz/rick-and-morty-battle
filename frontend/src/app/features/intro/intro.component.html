@@ -1,0 +1,78 @@
+<section class="intro-screen">
+  <div class="top-actions">
+    <div class="lang-selector">
+      <button [class.active]="gameState.language() === 'PT'" (click)="gameState.changeLanguage('PT')">PT</button>
+      <span class="divider">|</span>
+      <button [class.active]="gameState.language() === 'EN'" (click)="gameState.changeLanguage('EN')">EN</button>
+    </div>
+    <button class="btn-help" (click)="gameState.toggleModal(true)">?</button>
+  </div>
+
+  <div class="logo-container">
+    <h1 class="logo-layer ghost">Rick and Morty Battle</h1>
+    <h1 class="logo-layer bottom">Rick and Morty Battle</h1>
+    <h1 class="logo-layer middle">Rick and Morty Battle</h1>
+    <h1 class="logo-layer top">Rick and Morty Battle</h1>
+  </div>
+  <p class="subtitle">{{ gameState.texts().INTRO.SUBTITLE }}</p>
+
+  <button class="btn-start-game" [disabled]="!gameState.isDataReady()" (click)="gameState.startGame()">
+    {{ gameState.isDataReady() ? gameState.texts().INTRO.START_BTN : gameState.texts().INTRO.LOADING }}
+  </button>
+</section>
+
+@if (gameState.isModalOpen()) {
+  <div class="modal-backdrop" (click)="gameState.toggleModal(false)">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ gameState.texts().MODAL.TITLE }}</h2>
+        <button class="close-x" (click)="gameState.toggleModal(false)">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          <strong>{{ gameState.texts().MODAL.STEP_1_TITLE }}</strong> {{ gameState.texts().MODAL.STEP_1_DESC }}
+        </p>
+        <p>
+          <strong>{{ gameState.texts().MODAL.STEP_2_TITLE }}</strong> {{ gameState.texts().MODAL.STEP_2_DESC }}
+        </p>
+        <p>
+          <strong>{{ gameState.texts().MODAL.STEP_3_TITLE }}</strong> {{ gameState.texts().MODAL.STEP_3_DESC }}
+        </p>
+
+        <div class="icons-legend-container">
+          <p class="legend-title">
+            <strong>{{ gameState.texts().MODAL.ICONS_TITLE }}</strong>
+          </p>
+          <div class="icons-row">
+            <div class="icon-item">
+              <svg class="icon icon-survival" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              {{ gameState.texts().MODAL.SURVIVAL }}
+            </div>
+            <div class="icon-item">
+              <svg class="icon icon-popularity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              {{ gameState.texts().MODAL.POPULARITY }}
+            </div>
+            <div class="icon-item">
+              <svg class="icon icon-weirdness" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a9 9 0 0 0-9 9c0 3 2.5 6 5 8 .5.5 1.5 1 2 1h4c.5 0 1.5-.5 2-1 2.5-2 5-5 5-8a9 9 0 0 0-9-9z"/>
+                <circle cx="9" cy="11.5" r="1.5" fill="currentColor"/>
+                <circle cx="15" cy="11.5" r="1.5" fill="currentColor"/>
+                <path d="M10 15.5c1 .5 2 .5 3 0"/>
+              </svg>
+              {{ gameState.texts().MODAL.WEIRDNESS }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-close-modal" (click)="gameState.toggleModal(false)">{{ gameState.texts().MODAL.BTN }}</button>
+      </div>
+    </div>
+  </div>
+}

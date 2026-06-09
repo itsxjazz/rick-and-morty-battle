@@ -1,203 +1,35 @@
 <div class="main-container">
-  <section *ngIf="gameState === 'INTRO'" class="intro-screen">
-    <div class="top-actions">
-      <div class="lang-selector">
-        <button [class.active]="language === 'PT'" (click)="changeLanguage('PT')">PT</button>
-        <span class="divider">|</span>
-        <button [class.active]="language === 'EN'" (click)="changeLanguage('EN')">EN</button>
-      </div>
-      <button class="btn-help" (click)="toggleModal(true)">?</button>
-    </div>
-
-    <div class="logo-container">
-      <h1 class="logo-layer ghost">Rick and Morty Battle</h1>
-      <h1 class="logo-layer bottom">Rick and Morty Battle</h1>
-      <h1 class="logo-layer middle">Rick and Morty Battle</h1>
-      <h1 class="logo-layer top">Rick and Morty Battle</h1>
-    </div>
-    <p class="subtitle">{{ texts.INTRO.SUBTITLE }}</p>
-
-    <button class="btn-start-game" [disabled]="!isDataReady" (click)="startGame()">
-      {{ isDataReady ? texts.INTRO.START_BTN : texts.INTRO.LOADING }}
-    </button>
-  </section>
-
-  <div class="modal-backdrop" *ngIf="isModalOpen" (click)="toggleModal(false)">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ texts.MODAL.TITLE }}</h2>
-        <button class="close-x" (click)="toggleModal(false)">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          <strong>{{ texts.MODAL.STEP_1_TITLE }}</strong> {{ texts.MODAL.STEP_1_DESC }}
-        </p>
-        <p>
-          <strong>{{ texts.MODAL.STEP_2_TITLE }}</strong> {{ texts.MODAL.STEP_2_DESC }}
-        </p>
-        <p>
-          <strong>{{ texts.MODAL.STEP_3_TITLE }}</strong> {{ texts.MODAL.STEP_3_DESC }}
-        </p>
-
-        <div class="icons-legend-container">
-          <p class="legend-title">
-            <strong>{{ texts.MODAL.ICONS_TITLE }}</strong>
-          </p>
-          <div class="icons-row">
-            <div class="icon-item"><span>🛡️</span> {{ texts.MODAL.SURVIVAL }}</div>
-            <div class="icon-item"><span>🌟</span> {{ texts.MODAL.POPULARITY }}</div>
-            <div class="icon-item"><span>👽</span> {{ texts.MODAL.WEIRDNESS }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-close-modal" (click)="toggleModal(false)">{{ texts.MODAL.BTN }}</button>
-      </div>
-    </div>
-  </div>
-
-  <section *ngIf="gameState === 'DEALING'" class="dealing-screen">
-    <div class="deck-container">
-      <app-card
-        *ngFor="let card of heroOptions"
-        [card]="card"
-        [currentTexts]="texts"
-        class="deck-card"
-      >
-      </app-card>
-    </div>
-  </section>
-
-  <section *ngIf="gameState === 'SELECTION'" class="game-screen">
-    <div class="header-hud">
-      <div class="stats-bar">
-        <div class="full-scoreboard">
-          <div class="score-item win">
-            <span class="stat-label">{{ texts.SELECTION.WINS }}</span>
-            <span class="stat-value">{{ scoreboard.wins }}</span>
-          </div>
-          <div class="score-line"></div>
-          <div class="score-item draw">
-            <span class="stat-label">{{ texts.SELECTION.DRAWS }}</span>
-            <span class="stat-value">{{ scoreboard.draws }}</span>
-          </div>
-          <div class="score-line"></div>
-          <div class="score-item loss">
-            <span class="stat-label">{{ texts.SELECTION.LOSSES }}</span>
-            <span class="stat-value">{{ scoreboard.losses }}</span>
-          </div>
-        </div>
-
-        <div class="streak-badge-inline" [class.active]="scoreboard.currentStreak > 0">
-          <div class="fire-icon">🔥</div>
-          <div class="streak-info">
-            <span class="streak-title"
-              >{{ texts.SELECTION.STREAK }}: {{ scoreboard.currentStreak }}</span
+  @switch (gameState.gameState()) {
+    @case ('INTRO') {
+      <app-intro></app-intro>
+    }
+    @case ('DEALING') {
+      <section class="dealing-screen">
+        <div class="deck-container">
+          @for (card of gameState.heroOptions(); track card._id) {
+            <app-card
+              [card]="card"
+              [currentTexts]="gameState.texts()"
+              class="deck-card"
             >
-            <span class="streak-record" *ngIf="scoreboard.bestStreak > 0"
-              >{{ texts.SELECTION.RECORD }}: {{ scoreboard.bestStreak }}</span
-            >
-          </div>
+            </app-card>
+          }
         </div>
-      </div>
-      <h2>{{ texts.SELECTION.TITLE }}</h2>
-    </div>
-
-    <div *ngIf="!loading" class="cards-selection">
-      <app-card
-        *ngFor="let card of heroOptions"
-        [card]="card"
-        [currentTexts]="texts"
-        (click)="chooseCard(card)"
-        [class.selected]="playerCard?._id === card._id"
-        class="card-wrapper"
-      >
-      </app-card>
-    </div>
-
-    <div class="actions-container" *ngIf="playerCard">
-      <button class="btn-battle" (click)="goToBattle()">{{ texts.SELECTION.BATTLE_BTN }}</button>
-    </div>
-  </section>
-
-  <section *ngIf="gameState === 'BATTLE'" class="battle-arena">
-    <h1
-      *ngIf="battleResult"
-      class="battle-title"
-      [class.win]="battleResult === 'VICTORY'"
-      [class.lose]="battleResult === 'DEFEAT'"
-      [class.draw]="battleResult === 'DRAW'"
-    >
-      {{
-        battleResult === 'VICTORY'
-          ? texts.BATTLE.VICTORY_TITLE
-          : battleResult === 'DEFEAT'
-            ? texts.BATTLE.DEFEAT_TITLE
-            : texts.BATTLE.DRAW_TITLE
-      }}
-    </h1>
-
-    <div class="versus-container">
-      <div class="fighter player">
-        <h3
-          [class.status-win]="battleResult === 'VICTORY'"
-          [class.status-lose]="battleResult === 'DEFEAT'"
-          [class.status-draw]="battleResult === 'DRAW'"
-        >
-          {{ texts.BATTLE.YOU }} <span class="score-badge">{{ playerRoundWins }}</span>
-        </h3>
-        <div
-          class="card-display"
-          [class.status-win]="battleResult === 'VICTORY'"
-          [class.status-lose]="battleResult === 'DEFEAT'"
-          [class.status-draw]="battleResult === 'DRAW'"
-        >
-          <app-card [card]="playerCard!" [currentTexts]="texts"></app-card>
-        </div>
-      </div>
-
-      <div class="rounds-panel">
-        <div class="rounds-list">
-          <div *ngFor="let round of battleRounds" class="round-item" [ngClass]="round.winner">
-            <span class="round-val p-val">{{ round.pVal }}</span>
-            <span class="round-attr">{{ round.attr }}</span>
-            <span class="round-val e-val">{{ round.eVal }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fighter enemy">
-        <h3
-          [class.status-win]="battleResult === 'DEFEAT'"
-          [class.status-lose]="battleResult === 'VICTORY'"
-          [class.status-draw]="battleResult === 'DRAW'"
-        >
-          {{ texts.BATTLE.ENEMY }} <span class="score-badge">{{ enemyRoundWins }}</span>
-        </h3>
-        <div
-          class="card-display"
-          [class.status-win]="battleResult === 'DEFEAT'"
-          [class.status-lose]="battleResult === 'VICTORY'"
-          [class.status-draw]="battleResult === 'DRAW'"
-        >
-          <app-card [card]="enemyCard!" [currentTexts]="texts"></app-card>
-        </div>
-      </div>
-    </div>
-
-    <div class="actions-container" *ngIf="battleResult">
-      <button class="btn-restart" (click)="startGame()">{{ texts.BATTLE.RESTART_BTN }}</button>
-      <button class="btn-quit" (click)="exitGame()">{{ texts.BATTLE.QUIT_BTN }}</button>
-    </div>
-  </section>
+      </section>
+    }
+    @case ('SELECTION') {
+      <app-selection></app-selection>
+    }
+    @case ('BATTLE') {
+      <app-battle></app-battle>
+    }
+  }
 </div>
 
 <div class="orientation-lock">
   <div class="lock-content">
     <div class="phone-icon"></div>
-    <h2>{{ texts.ORIENTATION.TITLE }}</h2>
-    <p>{{ texts.ORIENTATION.SUBTITLE }}</p>
+    <h2>{{ gameState.texts().ORIENTATION.TITLE }}</h2>
+    <p>{{ gameState.texts().ORIENTATION.SUBTITLE }}</p>
   </div>
 </div>

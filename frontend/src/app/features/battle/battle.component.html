@@ -1,0 +1,79 @@
+<section class="battle-arena">
+  @if (gameState.battleResult()) {
+    <h1
+      class="battle-title"
+      [class.win]="gameState.battleResult() === 'VICTORY'"
+      [class.lose]="gameState.battleResult() === 'DEFEAT'"
+      [class.draw]="gameState.battleResult() === 'DRAW'"
+    >
+      {{
+        gameState.battleResult() === 'VICTORY'
+          ? gameState.texts().BATTLE.VICTORY_TITLE
+          : gameState.battleResult() === 'DEFEAT'
+            ? gameState.texts().BATTLE.DEFEAT_TITLE
+            : gameState.texts().BATTLE.DRAW_TITLE
+      }}
+    </h1>
+  }
+
+  <div class="versus-container">
+    <div class="fighter player">
+      <h3
+        [class.status-win]="gameState.battleResult() === 'VICTORY'"
+        [class.status-lose]="gameState.battleResult() === 'DEFEAT'"
+        [class.status-draw]="gameState.battleResult() === 'DRAW'"
+      >
+        {{ gameState.texts().BATTLE.YOU }} <span class="score-badge">{{ gameState.playerRoundWins() }}</span>
+      </h3>
+      <div
+        class="card-display"
+        [class.status-win]="gameState.battleResult() === 'VICTORY'"
+        [class.status-lose]="gameState.battleResult() === 'DEFEAT'"
+        [class.status-draw]="gameState.battleResult() === 'DRAW'"
+      >
+        <app-card [card]="gameState.playerCard()!" [currentTexts]="gameState.texts()"></app-card>
+      </div>
+    </div>
+
+    <div class="rounds-panel">
+      <div class="rounds-list">
+        @for (round of gameState.battleRounds(); track $index) {
+          <div class="round-item" [ngClass]="round.winner">
+            <span class="round-val player-val" [class.winner]="round.winner === 'PLAYER'" [class.loser]="round.winner === 'ENEMY'">
+              {{ round.pVal }}
+            </span>
+            <span class="round-attr">{{ round.attr }}</span>
+            <span class="round-val enemy-val" [class.winner]="round.winner === 'ENEMY'" [class.loser]="round.winner === 'PLAYER'">
+              {{ round.eVal }}
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="fighter enemy">
+      <h3
+        [class.status-win]="gameState.battleResult() === 'DEFEAT'"
+        [class.status-lose]="gameState.battleResult() === 'VICTORY'"
+        [class.status-draw]="gameState.battleResult() === 'DRAW'"
+      >
+        {{ gameState.texts().BATTLE.ENEMY }} <span class="score-badge">{{ gameState.enemyRoundWins() }}</span>
+      </h3>
+      <div
+        class="card-display"
+        [class.status-win]="gameState.battleResult() === 'DEFEAT'"
+        [class.status-lose]="gameState.battleResult() === 'VICTORY'"
+        [class.status-draw]="gameState.battleResult() === 'DRAW'"
+      >
+        <app-card [card]="gameState.enemyCard()!" [currentTexts]="gameState.texts()"></app-card>
+      </div>
+    </div>
+  </div>
+
+  @if (gameState.battleResult()) {
+    <div class="actions-container">
+      <button class="btn-restart" (click)="gameState.startGame()">{{ gameState.texts().BATTLE.RESTART_BTN }}</button>
+      <button class="btn-quit" (click)="gameState.exitGame()">{{ gameState.texts().BATTLE.QUIT_BTN }}</button>
+    </div>
+  }
+</section>

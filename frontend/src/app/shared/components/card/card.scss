@@ -1,8 +1,5 @@
-/* --- CORES DE RARIDADE (NEON) --- */
-$common-color: #9e9e9e; /* Cinza/Branco */
-$rare-color: #00b5cc; /* Azul Portal */
-$epic-color: #9d4edd; /* Roxo Cósmico */
-$legendary-color: #ffd700; /* Ouro Alienígena */
+@use 'variables' as var;
+@use 'mixins' as mix;
 
 :host {
   display: block;
@@ -29,29 +26,26 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
 
   /* Efeito Hover no Card Inteiro */
   &:hover {
-    transform: translateY(-5px) scale(1.02);
+    transform: translateY(-4px) scale(1.01);
     z-index: 10;
   }
 
   /* --- CORES DINÂMICAS POR RARIDADE --- */
   &.common {
-    --neon-color: #{$common-color};
+    --neon-color: #{var.$common-color};
   }
   &.rare {
-    --neon-color: #{$rare-color};
+    --neon-color: #{var.$rare-color};
   }
   &.epic {
-    --neon-color: #{$epic-color};
+    --neon-color: #{var.$epic-color};
   }
   &.legendary {
-    --neon-color: #{$legendary-color};
+    --neon-color: #{var.$legendary-color};
   }
 
-  /* Borda brilhante interna baseada na raridade */
-  box-shadow:
-    inset 0 0 15px var(--neon-color),
-    0 10px 20px rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--neon-color);
+  /* Borda brilhante interna usando mixin reutilizável */
+  @include mix.neon-glow(var(--neon-color), 15px);
 }
 
 /* --- CABEÇALHO --- */
@@ -60,12 +54,11 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
   justify-content: space-between;
   margin-bottom: 6px;
   padding: 0 8px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: var.$font-family-game;
   font-size: 0.6rem;
   font-weight: bold;
   text-transform: uppercase;
-  color: var(--neon-color);
-  text-shadow: 0 0 5px var(--neon-color);
+  @include mix.neon-text-glow(var(--neon-color), 5px);
   letter-spacing: 0.5px;
 }
 
@@ -77,14 +70,13 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
   border: 2px solid #111;
   border-radius: 6px;
   overflow: hidden;
-  /* Sombra interna para parecer afundado no chassi */
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
 
   .character-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: contrast(1.1) brightness(0.9) grayscale(0.2); /* Aspecto de monitor velho */
+    filter: contrast(1.1) brightness(0.9) grayscale(0.2);
     transition: all 0.3s;
   }
 
@@ -106,9 +98,8 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
     opacity: 0.7;
   }
 
-  /* Efeito de Glitch no Hover */
   &:hover .character-image {
-    filter: contrast(1.3) brightness(1.2) grayscale(0); /* Fica vivido */
+    filter: contrast(1.3) brightness(1.2) grayscale(0);
     transform: scale(1.05);
   }
 }
@@ -116,18 +107,16 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
 /* --- PAINEL DE DADOS (DATA PAD) --- */
 .data-panel {
   margin-top: 6px;
-  background: #151515; /* Carbono escuro */
+  background: #151515;
   border-top: 2px solid #333;
   padding: 6px;
   border-radius: 0 0 8px 8px;
   position: relative;
-
-  /* Textura sutil de fibra/grade */
   background-image: radial-gradient(#222 15%, transparent 16%);
   background-size: 4px 4px;
 
   h3 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var.$font-family-game;
     color: white;
     font-size: 0.8rem;
     margin: 0 0 3px 0;
@@ -139,7 +128,7 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
 }
 
 .status-indicator {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var.$font-family-mono;
   font-size: 0.8rem;
   color: #888;
   display: flex;
@@ -185,14 +174,14 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 6px; /* Espaço ergonômico curto entre ícone e número */
   min-height: 40px;
-
   box-shadow:
     inset 2px 2px 5px rgba(0, 0, 0, 0.9),
     inset -1px -1px 0px rgba(255, 255, 255, 0.1);
 
   label {
-    font-family: 'Roboto Mono', monospace;
+    font-family: var.$font-family-mono;
     font-size: 0.5rem;
     color: #ffffff;
     margin-bottom: 2px;
@@ -202,17 +191,16 @@ $legendary-color: #ffd700; /* Ouro Alienígena */
     text-align: center;
     text-transform: uppercase;
     white-space: nowrap;
-
     transform: scaleX(0.85);
     display: block;
   }
 
   span {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var.$font-family-game;
     font-size: 0.9rem;
     color: #ffffff;
     font-weight: 900;
-    text-shadow: 0 0 10px var(--neon-color);
     line-height: 1;
+    /* REMOVIDO: text-shadow para melhorar nitidez e acessibilidade dos valores de atributos */
   }
 }

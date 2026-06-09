@@ -1,0 +1,332 @@
+@use 'variables' as var;
+@use 'mixins' as mix;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.intro-screen {
+  .logo-container {
+    display: grid;
+    grid-template-areas: 'stack';
+    place-items: center;
+    width: 100%;
+    max-width: 95vw;
+    min-height: clamp(120px, 18vh, 220px);
+    animation: floatLogo 3s ease-in-out infinite;
+  }
+  
+  .logo-layer {
+    font-family: var.$font-family-display;
+    font-size: clamp(2.2rem, 10vw, 7rem);
+    line-height: 1.1;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    white-space: normal;
+    grid-area: stack;
+  }
+  
+  .logo-layer.ghost {
+    color: transparent;
+    z-index: 0;
+    position: relative;
+  }
+  
+  .logo-layer.top {
+    color: var.$portal-green;
+    z-index: 3;
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo-layer.middle {
+    color: #edfc30;
+    z-index: 2;
+    -webkit-text-stroke: 0.12em #edfc30;
+  }
+  
+  .logo-layer.bottom {
+    color: transparent;
+    z-index: 1;
+    filter: drop-shadow(0 0 20px rgba(100, 200, 50, 0.9));
+  }
+  
+  .subtitle {
+    font-size: clamp(0.7rem, 2.5vw, 1.2rem);
+    color: var.$neon-green;
+    margin-top: 25px; 
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-shadow: 0 0 15px var.$neon-green;
+    max-width: 90%;
+    text-align: center;
+  }
+  
+  .btn-start-game {
+    @include mix.button-style;
+  }
+}
+
+.top-actions {
+  position: absolute;
+  top: clamp(20px, 4vh, 40px);
+  right: clamp(40px, 6vw, 100px); 
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 100;
+}
+
+.lang-selector {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(151, 206, 76, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  button {
+    background: none;
+    border: none;
+    color: #666;
+    font-weight: 900;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #fff;
+    }
+    
+    &.active {
+      color: var.$neon-green;
+      text-shadow: 0 0 10px var.$neon-green;
+    }
+  }
+
+  .divider {
+    color: #333;
+    font-size: 0.7rem;
+  }
+}
+
+.btn-help {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid var.$neon-green;
+  background: rgba(0, 0, 0, 0.5);
+  color: var.$neon-green;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    box-shadow: 0 0 15px var.$neon-green;
+    transform: scale(1.1);
+  }
+}
+
+/* --- ESTRUTURA DO MODAL --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-card {
+  @include mix.glass-panel(#0b0c10, 0.95, var.$portal-green);
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  box-shadow: 0 0 30px rgba(0, 181, 204, 0.35);
+  position: relative;
+
+  h2 {
+    color: #edfc30;
+    font-family: var.$font-family-display;
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+  }
+
+  .modal-body {
+    color: #f0f0f0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    
+    p {
+      margin-bottom: 15px;
+      font-weight: 500; 
+    }
+    
+    strong {
+      color: #b3ff33; 
+      font-weight: 700;
+    }
+  }
+
+  .icons-legend-container {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(151, 206, 76, 0.2);
+
+    .legend-title {
+      font-size: 0.9rem;
+      color: var.$neon-green;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  }
+
+  .icons-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 10px;
+
+    .icon-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #ccc;
+
+      .icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        filter: drop-shadow(0 0 3px currentColor);
+      }
+    }
+  }
+}
+
+.close-x {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 2rem;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  
+  &:hover {
+    color: white;
+  }
+}
+
+.btn-close-modal {
+  @include mix.button-style;
+  width: 100%;
+  margin-top: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatLogo {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Responsividade */
+@include mix.mobile-landscape {
+  .top-actions {
+    top: max(15px, env(safe-area-inset-top));
+    right: max(40px, env(safe-area-inset-right)); 
+  }
+
+  .intro-screen {
+    .logo-container {
+      min-height: 60px; 
+    }
+    .logo-layer {
+      font-size: 3rem;
+    }
+    
+    .subtitle {
+      font-size: 0.8rem;
+      margin-top: 10px; 
+      margin-bottom: 15px;
+    }
+    
+    .btn-start-game {
+      margin-top: 10px !important;
+      padding: 8px 25px;
+      font-size: 0.9rem;
+    }
+  }
+
+  .modal-card {
+    max-width: 80%;
+    padding: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
+    
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .modal-body p {
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+    
+    .btn-close-modal {
+      margin-top: 10px !important;
+      padding: 8px 25px;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@include mix.ultra-short-screens {
+  .intro-screen {
+    .logo-container {
+      min-height: 60px; 
+    }
+  }
+}
