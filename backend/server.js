@@ -42,6 +42,11 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
+
 // Conexão com o Banco
 mongoose
   .connect(process.env.MONGO_URI)

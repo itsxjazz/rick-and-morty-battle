@@ -1,0 +1,334 @@
+@use 'variables' as var;
+@use 'mixins' as mix;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.battle-arena {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  .battle-title {
+    font-family: var.$font-family-game;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    text-transform: uppercase;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 50px;
+    color: white;
+    
+    &.win {
+      text-shadow:
+        0 0 30px var.$color-win,
+        0 0 10px var.$color-win;
+    }
+    &.lose {
+      text-shadow:
+        0 0 30px var.$color-lose,
+        0 0 10px var.$color-lose;
+    }
+    &.draw {
+      text-shadow:
+        0 0 30px var.$color-draw,
+        0 0 10px var.$color-draw;
+    }
+  }
+}
+
+.versus-container {
+  display: grid;
+  grid-template-columns: 1fr 300px 1fr;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1300px;
+}
+
+.card-display {
+  position: relative;
+  transition: all 0.6s ease;
+  
+  &.status-win {
+    transform: translateY(10px) scale(1.05);
+    z-index: 5;
+    
+    ::ng-deep .card-chassis {
+      border-color: var.$color-win !important;
+      box-shadow: 0 0 50px var.$color-win !important;
+    }
+  }
+  
+  &.status-lose {
+    ::ng-deep .card-chassis {
+      filter: grayscale(0.7) brightness(0.75) contrast(1.1) !important;
+      opacity: 0.65;
+    }
+  }
+  
+  &.status-draw {
+    ::ng-deep .card-chassis {
+      border-color: var.$color-draw !important;
+      box-shadow: 0 0 30px var.$color-draw !important;
+    }
+  }
+}
+
+.rounds-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  order: 2;
+  
+  .rounds-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .round-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 1.5px solid #333;
+    font-family: var.$font-family-game;
+    animation: slideInRound 0.5s ease-out forwards;
+    
+    &.PLAYER {
+      border-color: var.$neon-green;
+      box-shadow: inset 0 0 15px rgba(151, 206, 76, 0.2);
+    }
+    
+    &.ENEMY {
+      border-color: var.$color-lose;
+      box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.2);
+    }
+    
+    &.DRAW {
+      border-color: var.$color-draw;
+      
+      .round-val {
+        color: var.$color-draw;
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
+      }
+    }
+    
+    .round-attr {
+      font-family: var.$font-family-mono;
+      font-size: 0.85rem;
+      color: #fff;
+      text-transform: uppercase;
+      font-weight: bold;
+      opacity: 0.8;
+    }
+    
+    .round-val {
+      font-family: var.$font-family-mono;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #888; /* Tom cinza neutro e bem legível por padrão */
+      line-height: 1;
+      transition: all 0.3s ease;
+      
+      &.winner {
+        font-size: 1.6rem;
+        font-weight: 900;
+        
+        &.player-val {
+          color: var.$neon-green;
+          filter: drop-shadow(0 0 8px var.$neon-green);
+        }
+        
+        &.enemy-val {
+          color: var.$epic-color; /* Magenta Cósmico */
+          filter: drop-shadow(0 0 8px var.$epic-color);
+        }
+      }
+      
+      &.loser {
+        color: #777;
+        font-size: 1.05rem;
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+.fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  h3 {
+    font-family: var.$font-family-game;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: all 0.5s ease;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    &.status-win {
+      color: var.$color-win;
+      text-shadow: 0 0 15px var.$color-win;
+    }
+    &.status-lose {
+      color: var.$color-lose;
+      text-shadow: 0 0 15px var.$color-lose;
+    }
+    &.status-draw {
+      color: var.$color-draw;
+      text-shadow: 0 0 15px var.$color-draw;
+    }
+  }
+  
+  &.player {
+    order: 1;
+  }
+  &.enemy {
+    order: 3;
+  }
+}
+
+.score-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  font-family: var.$font-family-game;
+  font-size: 1rem;
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.7);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.actions-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-restart,
+.btn-quit {
+  @include mix.button-style;
+  margin-top: 0;
+}
+
+@keyframes slideInRound {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-4px); }
+}
+
+@keyframes bounceRight {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(4px); }
+}
+
+/* Responsividade */
+@include mix.mobile-landscape {
+  .battle-arena {
+    .battle-title {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+    }
+
+    .versus-container {
+      grid-template-columns: 1fr 180px 1fr;
+      gap: 0px;
+      margin-bottom: 20px;
+    }
+
+    .fighter {
+      h3 {
+        font-size: 0.75rem;
+        padding: 4px 15px;
+        margin-bottom: -5px;
+        gap: 15px;
+      }
+      
+      .card-display {
+        transform: scale(0.65);
+        margin: -50px 0 !important;
+      }
+    }
+
+    .score-badge {
+      width: 24px;
+      height: 24px;
+      font-size: 0.8rem;
+      border-width: 1.5px;
+    }
+
+    .rounds-panel {
+      gap: 10px;
+      
+      .round-item {
+        padding: 5px 10px;
+        
+        .round-val {
+          font-size: 0.85rem;
+          
+          &.winner {
+            font-size: 1.15rem;
+          }
+          
+          &.loser {
+            font-size: 0.75rem;
+          }
+        }
+        
+        .round-attr {
+          font-size: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .actions-container {
+    margin-top: 15px !important; 
+    padding-top: 0;
+    gap: 20px !important; 
+    margin-bottom: 10px;
+    
+    .btn-restart,
+    .btn-quit {
+      font-size: 0.9rem;
+      padding: 8px 25px;
+    }
+  }
+}
+
+@include mix.ultra-short-screens {
+  .fighter .card-display {
+    transform: scale(0.55);
+  }
+}

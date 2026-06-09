@@ -1,0 +1,89 @@
+@use 'variables' as var;
+
+/* --- ESTILO DE BOTÃO CÓSMICO --- */
+@mixin button-style {
+  background: transparent;
+  border: 2px solid var.$neon-green;
+  color: var.$neon-green;
+  padding: clamp(10px, 2vw, 15px) clamp(20px, 5vw, 45px);
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 900;
+  margin-top: 15px;
+  box-shadow: 0 0 10px rgba(151, 206, 76, 0.2);
+  
+  &:hover {
+    background: rgba(151, 206, 76, 0.12);
+    color: var.$neon-green;
+    box-shadow: 
+      0 0 35px var.$neon-green,
+      inset 0 0 15px rgba(151, 206, 76, 0.45);
+    text-shadow: 0 0 8px var.$neon-green;
+    transform: scale(1.05);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+  }
+}
+
+/* --- EFEITO GLASSMORPHISM --- */
+@mixin glassmorphism($bg-opacity: 0.1, $blur: 10px, $border-opacity: 0.2) {
+  background: rgba(255, 255, 255, $bg-opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, $border-opacity);
+}
+
+/* --- DETECÇÃO DE TOUCH E ORIENTAÇÃO RETRATO --- */
+@mixin portrait-touch {
+  @media (orientation: portrait) and (pointer: coarse) {
+    @content;
+  }
+}
+
+/* --- MOBILE E TELAS PEQUENAS --- */
+@mixin mobile-landscape {
+  @media (max-width: 932px) {
+    @content;
+  }
+}
+
+/* --- TELAS COM ALTURA COMPACTA --- */
+@mixin ultra-short-screens {
+  @media (max-height: 420px) {
+    @content;
+  }
+}
+
+/* --- GLOW NEON DINÂMICO --- */
+@mixin neon-glow($color, $glow-radius: 15px) {
+  border: 1px solid $color;
+  box-shadow: 
+    inset 0 0 $glow-radius rgba($color, 0.5),
+    0 0 ($glow-radius * 2) rgba($color, 0.3);
+}
+
+@mixin neon-text-glow($color, $glow-radius: 5px) {
+  color: $color;
+  text-shadow: 
+    0 0 $glow-radius $color,
+    0 0 ($glow-radius * 2) rgba($color, 0.5);
+}
+
+/* --- PAINEL GLASSMORPHISM TEMÁTICO --- */
+@mixin glass-panel($bg-color: #0b0c10, $opacity: 0.9, $border-color: #333) {
+  background: rgba($bg-color, $opacity);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid $border-color;
+  border-radius: 12px;
+}
+

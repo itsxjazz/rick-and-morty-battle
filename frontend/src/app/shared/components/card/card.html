@@ -1,0 +1,61 @@
+@if (card && currentTexts) {
+  <div class="card-chassis" [class]="card.rarity.toLowerCase()">
+    <div class="screws"></div>
+
+    <div class="card-header">
+      <span class="rarity">{{ currentTexts.RARITY[card.rarity] }}</span>
+      <span class="species">{{ currentTexts.CARD_DATA.SPECIES[card.species] || card.species }}</span>
+    </div>
+
+    <div class="screen-container">
+      <div class="scanlines"></div>
+      <div class="glitch-overlay"></div>
+      <img [src]="card.image" [alt]="card.name" class="character-image" />
+    </div>
+
+    <div class="data-panel">
+      <h3 class="name">{{ card.name }}</h3>
+
+      <div class="status-indicator">
+        <span
+          class="led"
+          [class.alive]="card.status === 'Alive'"
+          [class.dead]="card.status === 'Dead'"
+        ></span>
+        {{ currentTexts.CARD_DATA.STATUS[card.status] || card.status }}
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box" [title]="currentTexts.STATS.survival">
+          <span class="stat-icon">
+            <svg class="icon icon-survival" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </span>
+          <span class="stat-value">{{ card.stats.survival }}</span>
+        </div>
+
+        <div class="stat-box" [title]="currentTexts.STATS.popularity">
+          <span class="stat-icon">
+            <svg class="icon icon-popularity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </span>
+          <span class="stat-value">{{ card.stats.popularity }}</span>
+        </div>
+
+        <div class="stat-box" [title]="currentTexts.STATS.weirdness">
+          <span class="stat-icon">
+            <svg class="icon icon-weirdness" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a9 9 0 0 0-9 9c0 3 2.5 6 5 8 .5.5 1.5 1 2 1h4c.5 0 1.5-.5 2-1 2.5-2 5-5 5-8a9 9 0 0 0-9-9z"/>
+              <circle cx="9" cy="11.5" r="1.5" fill="currentColor"/>
+              <circle cx="15" cy="11.5" r="1.5" fill="currentColor"/>
+              <path d="M10 15.5c1 .5 2 .5 3 0"/>
+            </svg>
+          </span>
+          <span class="stat-value">{{ card.stats.weirdness }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

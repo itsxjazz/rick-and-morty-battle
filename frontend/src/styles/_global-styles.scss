@@ -1,0 +1,111 @@
+@use 'variables' as var;
+@use 'mixins' as mix;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap');
+
+/* --- FONTE RICK AND MORTY --- */
+@font-face {
+  font-family: 'Get Schwifty';
+  src: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/3089507/get-schwifty.woff') format('woff');
+}
+
+/* --- RESET GLOBAL --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var.$space-black;
+  color: #c5c6c7;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+app-root {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* --- ESTILOS DE BOTÃO BASE --- */
+button {
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* --- SEÇÃO CONTAINER TELA (GLOBAL) --- */
+section {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@include mix.mobile-landscape {
+  section {
+    padding: 10px;
+    min-height: 100vh;
+  }
+}
+
+/* --- ESTILOS DE ÍCONES SVG --- */
+.icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: inline-block;
+  vertical-align: middle;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  transition: all 0.3s ease;
+  
+  &.icon-survival {
+    color: var.$neon-green;
+    filter: drop-shadow(0 0 3px rgba(151, 206, 76, 0.4));
+  }
+  &.icon-popularity {
+    color: var.$neon-green;
+    fill: rgba(151, 206, 76, 0.1);
+    filter: drop-shadow(0 0 3px rgba(151, 206, 76, 0.4));
+  }
+  &.icon-weirdness {
+    color: var.$neon-green;
+    filter: drop-shadow(0 0 3px rgba(151, 206, 76, 0.4));
+  }
+  &.icon-streak {
+    color: #00d2ff; /* Azul Neon */
+    fill: rgba(#00d2ff, 0.15);
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+}
+
+
+
