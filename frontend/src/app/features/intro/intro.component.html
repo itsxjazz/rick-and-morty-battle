@@ -16,8 +16,8 @@
   </div>
   <p class="subtitle">{{ gameState.texts().INTRO.SUBTITLE }}</p>
 
-  <button class="btn-start-game" [disabled]="!gameState.isDataReady()" (click)="gameState.startGame()">
-    {{ gameState.isDataReady() ? gameState.texts().INTRO.START_BTN : gameState.texts().INTRO.LOADING }}
+  <button class="btn-start-game" [disabled]="!gameState.isDataReady() || gameState.loading()" (click)="gameState.startGame()">
+    {{ (gameState.isDataReady() && !gameState.loading()) ? gameState.texts().INTRO.START_BTN : gameState.texts().INTRO.LOADING }}
   </button>
 </section>
 

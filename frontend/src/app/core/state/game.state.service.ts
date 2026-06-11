@@ -149,15 +149,25 @@ export class GameStateService {
   }
 
   // --- GAME FLOW ---
-  startGame() {
+  async startGame() {
     if (!this.isDataReady() || this._allCards().length === 0) return;
 
-    this._gameState.set('DEALING');
     this._loading.set(true);
     this._playerCard.set(null);
     this._enemyCard.set(null);
     this._battleResult.set(null);
-    this._heroOptions.set(this.getRandomCards(4));
+
+    const selectedCards = this.getRandomCards(4);
+    this._heroOptions.set(selectedCards);
+
+    const imageUrls = selectedCards.map((c) => c.image).filter(Boolean);
+    try {
+      await this.preloadImages(imageUrls);
+    } catch (e) {
+      console.error('Erro ao pré-carregar imagens das variantes:', e);
+    }
+
+    this._gameState.set('DEALING');
 
     setTimeout(() => {
       this._gameState.set('SELECTION');
@@ -198,6 +208,16 @@ export class GameStateService {
 
     const chosenEnemy = enemyPool[Math.floor(Math.random() * enemyPool.length)];
     this._enemyCard.set(chosenEnemy);
+
+    if (chosenEnemy && chosenEnemy.image) {
+      this._loading.set(true);
+      try {
+        await this.preloadImages([chosenEnemy.image]);
+      } catch (e) {
+        console.error('Erro ao pré-carregar imagem do inimigo:', e);
+      }
+      this._loading.set(false);
+    }
 
     this._gameState.set('BATTLE');
     this._battleRounds.set([]);
@@ -259,7 +279,6 @@ export class GameStateService {
   exitGame() {
     this._gameState.set('INTRO');
     this._playerCard.set(null);
-    this.fetchCardsFromDatabase();
   }
 
   getRandomCards(amount: number): Card[] {
@@ -268,5 +287,17 @@ export class GameStateService {
 
   toggleModal(state: boolean) {
     this._isModalOpen.set(state);
+  }
+
+  private preloadImages(urls: string[]): Promise<void[]> {
+    const promises = urls.map(url => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = url;
+      });
+    });
+    return Promise.all(promises);
   }
 }

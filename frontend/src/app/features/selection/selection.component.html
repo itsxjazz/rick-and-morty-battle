@@ -56,7 +56,9 @@
 
   @if (gameState.playerCard()) {
     <div class="actions-container">
-      <button class="btn-battle" (click)="gameState.goToBattle()">{{ gameState.texts().SELECTION.BATTLE_BTN }}</button>
+      <button class="btn-battle" [disabled]="gameState.loading()" (click)="gameState.goToBattle()">
+        {{ gameState.loading() ? gameState.texts().INTRO.LOADING : gameState.texts().SELECTION.BATTLE_BTN }}
+      </button>
     </div>
   }
 </section>
